@@ -1,0 +1,1 @@
+eval $(cat .env/local) go run cmd/server/main.go

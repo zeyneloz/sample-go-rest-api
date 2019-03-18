@@ -1,0 +1,43 @@
+version: '3'
+services:
+  postgres_db:
+    image: postgres:11
+    container_name: sample-go-rest-api-db
+    env_file: .env/docker-local
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./build/docker/postgres/data:/var/lib/postgresql/data
+    networks:
+      - main
+
+  redis:
+    image: redis:5
+    container_name: sample-go-rest-api-redis
+    env_file: .env/docker-local
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./build/docker/redis/data:/data
+    networks:
+      - main
+
+  web:
+    build:
+      context: .
+      dockerfile: build/docker/web/Dockerfile
+    container_name: sample-go-rest-api-web
+    env_file: .env/docker-local
+    ports:
+      - 8080:8080
+    links:
+      - postgres_db:postgres_main_db
+      - redis:redis_cache
+    depends_on:
+      - postgres_db
+      - redis
+    networks:
+        - main
+
+networks:
+  main:
